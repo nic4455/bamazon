@@ -48,8 +48,21 @@ function chooseProduct(result) {
                 if (((chosenItem.stock_quantity) - (userResponses.numToBuy)) > 0) {
                     connection.query("UPDATE products SET stock_quantity='" + parseInt(result[i].stock_quantity - userResponses.numToBuy) + "' WHERE item_id ='" + parseInt(result[i].item_id) + "'", function (error, result) {
                         if (error) throw error;
-                        console.log("Purchase of " + parseInt(userResponses.numToBuy) + " " + chosenItem.product_name + " complete. The total ammount to be charged is $" + parseInt(userResponses.numToBuy * chosenItem.price));
-                        readProducts();
+                        console.log("Purchase of " + parseInt(userResponses.numToBuy) + " " + chosenItem.product_name + " complete. The total ammount to be charged is $" + parseFloat(userResponses.numToBuy * chosenItem.price).toFixed(2) + "\n");
+                        inquirer.prompt([
+                            {
+                                type: "list",
+                                name: "anotherPurchase",
+                                message: "Would you like to see today's inventory again?",
+                                choices: ["Yes", "No"]
+                            }]).then(function (userResponses) {
+                                if (userResponses.anotherPurchase  == "Yes") {
+                                    readProducts();
+                                } else {
+                                    process.exit();
+                                }
+                            })
+                        
                     })
                 } else if (userResponses.numToBuy > result[i].stock_quantity) {
                     console.log("Insufficient quantity!");
@@ -58,9 +71,7 @@ function chooseProduct(result) {
                     console.log("Invalid command");
                     readProducts();
                 }
-            // } else if ((userResponses.ID > result.length) || ((typeof userResponses.ID) === "string") || ((typeof userResponses.numToBuy) === "string") ){
-            //     console.log("Invalid command");
-            //     readProducts();
+            
             }        
 
         }
